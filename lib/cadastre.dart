@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:geolocator/geolocator.dart';
 
 class CadastrePage extends StatefulWidget {
   const CadastrePage({super.key});
