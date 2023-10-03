@@ -74,7 +74,6 @@ class MyFormCustomState extends State<MyFormCustom> {
                 ),
               ),
             ),
-            Container(),
             const SizedBox(
               height: 10,
             ),
@@ -130,6 +129,7 @@ class MyFormCustomState extends State<MyFormCustom> {
                 } else if (passwordController.text.length < 8) {
                   return "A senha tem que conter pelo menos 8 caracteres";
                 }
+                return null;
               },
             ),
             const SizedBox(height: 20),
