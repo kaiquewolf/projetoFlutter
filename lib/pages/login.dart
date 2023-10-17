@@ -1,31 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:projeto_flutter_mylink/pages/cadastre.dart';
+import 'package:projeto_flutter_mylink/pages/home.dart';
+import 'package:projeto_flutter_mylink/http/api.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff2f0f0),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 100.0),
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            children: <Widget>[
-              Image.asset(
-                'images/Logo.png',
-              ),
-              // ignore: prefer_const_constructors
-              MyFormCustom(),
-            ],
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 100),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              children: <Widget>[
+                Image.asset(
+                  'images/Logo.png',
+                ),
+                // ignore: prefer_const_constructors
+                MyFormCustom(),
+              ],
+            ),
           ),
         ),
       ),
@@ -44,8 +50,8 @@ class MyFormCustom extends StatefulWidget {
 
 class MyFormCustomState extends State<MyFormCustom> {
   final _formKey = GlobalKey<FormState>();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool passToggle = true;
 
   @override
@@ -79,7 +85,7 @@ class MyFormCustomState extends State<MyFormCustom> {
             ),
             TextFormField(
               keyboardType: TextInputType.emailAddress,
-              controller: emailController,
+              controller: _emailController,
               decoration: const InputDecoration(
                 labelText: 'name@example.com',
                 border: OutlineInputBorder(),
@@ -90,6 +96,7 @@ class MyFormCustomState extends State<MyFormCustom> {
                 } else if (!EmailValidator.validate(value, true)) {
                   return "Digite um Email válido";
                 }
+                return null;
               },
             ),
             const SizedBox(height: 20),
@@ -109,7 +116,7 @@ class MyFormCustomState extends State<MyFormCustom> {
             ),
             TextFormField(
               keyboardType: TextInputType.visiblePassword,
-              controller: passwordController,
+              controller: _passwordController,
               obscureText: passToggle,
               decoration: InputDecoration(
                 labelText: "************",
@@ -126,8 +133,6 @@ class MyFormCustomState extends State<MyFormCustom> {
               validator: (value) {
                 if (value!.isEmpty) {
                   return "Digite uma senha";
-                } else if (passwordController.text.length < 8) {
-                  return "A senha tem que conter pelo menos 8 caracteres";
                 }
                 return null;
               },
@@ -135,10 +140,13 @@ class MyFormCustomState extends State<MyFormCustom> {
             const SizedBox(height: 20),
             InkWell(
               onTap: () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
                 if (_formKey.currentState!.validate()) {
-                  print("Sucesso");
-                  emailController.clear();
-                  passwordController.clear();
+                  if (!currentFocus.hasPrimaryFocus) {
+                    // CircularProgressIndicator();
+                    _onClickLogin(context);
+                    currentFocus.unfocus();
+                  }
                 }
               },
               child: Container(
@@ -167,7 +175,10 @@ class MyFormCustomState extends State<MyFormCustom> {
                     backgroundColor: const Color(0xff2a8aa6)),
                 child: const Text("Criar conta"),
                 onPressed: () {
-                  return;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => CadastrePage()),
+                  );
                 },
               ),
             )
@@ -176,4 +187,33 @@ class MyFormCustomState extends State<MyFormCustom> {
       ),
     );
   }
+
+  _onClickLogin(BuildContext context) async {
+    final login = _emailController.text;
+    final password = _passwordController.text;
+    print("login: $login, Senha: $password");
+
+    var response = await LoginApi.login(login, password);
+    if (response == true) {
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(),
+        ),
+      );
+    } else {
+      _passwordController.clear();
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  final snackBar = const SnackBar(
+    content: Text(
+      'email ou senha incorretos.',
+      textAlign: TextAlign.center,
+    ),
+    backgroundColor: Colors.redAccent,
+  );
 }

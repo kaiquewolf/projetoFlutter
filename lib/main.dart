@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:projeto_flutter_mylink/cadastre.dart';
-import 'package:projeto_flutter_mylink/home.dart';
+import 'package:projeto_flutter_mylink/pages/welcome.dart';
 
 void main() {
   runApp(
-    const MaterialApp(
-      home: CadastrePage(),
+    MaterialApp(
+      theme: ThemeData(useMaterial3: true),
+      home: const WelcomePage(),
     ),
   );
 }

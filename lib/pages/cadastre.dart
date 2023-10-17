@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:projeto_flutter_mylink/components/switch.dart';
 
 class CadastrePage extends StatefulWidget {
   const CadastrePage({super.key});
@@ -14,15 +15,17 @@ class _CadastrePageState extends State<CadastrePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff2f0f0),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 100.0),
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: const Column(
-            children: <Widget>[
-              CadastrePageForm(),
-            ],
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 100.0),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            child: const Column(
+              children: <Widget>[
+                CadastrePageForm(),
+              ],
+            ),
           ),
         ),
       ),
@@ -43,6 +46,18 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool isSwitched = false;
+
+  // void locationCheckPermission() async {
+  //   final permission = await Geolocator.checkPermission;
+  //   _determinePosition();
+  //   if (isSwitched == true) {
+  //     Geolocator.requestPermission();
+  //   } else if (permission == LocationPermission.denied) {
+  //     isSwitched = false;
+
+  //     // LocationPermission.denied;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -144,25 +159,18 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
             const SizedBox(
               height: 20,
             ),
-            Row(
+            const Wrap(
+              direction: Axis.horizontal,
+              alignment: WrapAlignment.center,
               children: [
                 SizedBox(
                   width: 100,
-                  child: Switch(
-                    value: isSwitched,
-                    onChanged: (bool value) {
-                      setState(
-                        () {
-                          isSwitched = value;
-                          if (isSwitched == true) {
-                            // Geolocator.requestPermission();
-                          }
-                        },
-                      );
-                    },
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 20.0, right: 20),
+                    child: SwitchLocation(),
                   ),
                 ),
-                const Text(
+                Text(
                   "Permitir o acesso da minha \n localização durante o uso do \n aplicativo.",
                   style: TextStyle(
                     fontWeight: FontWeight.w400,
