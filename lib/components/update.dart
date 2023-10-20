@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:location/location.dart';
 import 'package:projeto_flutter_mylink/http/api.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:projeto_flutter_mylink/pages/welcome.dart';
@@ -46,7 +45,6 @@ class _UpdatePageFormState extends State<UpdatePageForm> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool isSwitched = false;
-  Location location = Location();
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +163,7 @@ class _UpdatePageFormState extends State<UpdatePageForm> {
                             isSwitched = value;
                           });
                           if (isSwitched == true) {
-                            location.requestPermission();
+                            Geolocator.requestPermission();
                           } else {}
                         },
                       ),

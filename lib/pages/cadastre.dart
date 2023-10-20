@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:projeto_flutter_mylink/http/api.dart';
 import 'package:projeto_flutter_mylink/pages/welcome.dart';
 
@@ -47,19 +47,6 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool isSwitched = false;
-  Location location = Location();
-
-  // void locationCheckPermission() async {
-  //   final permission = await Geolocator.checkPermission;
-  //   _determinePosition();
-  //   if (isSwitched == true) {
-  //     Geolocator.requestPermission();
-  //   } else if (permission == LocationPermission.denied) {
-  //     isSwitched = false;
-
-  //     // LocationPermission.denied;
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +165,7 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
                           isSwitched = value;
                         });
                         if (isSwitched == true) {
-                          location.requestPermission();
+                          Geolocator.requestPermission();
                         } else {}
                       },
                     ),
