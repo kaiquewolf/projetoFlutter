@@ -172,8 +172,20 @@ class MyFormCustomState extends State<MyFormCustom> {
               width: 150,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff2a8aa6)),
-                child: const Text("Criar conta"),
+                  backgroundColor: const Color(0xff2a8aa6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      5,
+                    ),
+                  ),
+                ),
+                child: const Text(
+                  "Criar conta",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                  ),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,

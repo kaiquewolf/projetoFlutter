@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:projeto_flutter_mylink/components/switch.dart';
+import 'package:location/location.dart';
+import 'package:projeto_flutter_mylink/http/api.dart';
+import 'package:projeto_flutter_mylink/pages/welcome.dart';
 
 class CadastrePage extends StatefulWidget {
   const CadastrePage({super.key});
@@ -46,6 +47,7 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool isSwitched = false;
+  Location location = Location();
 
   // void locationCheckPermission() async {
   //   final permission = await Geolocator.checkPermission;
@@ -150,8 +152,6 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
               validator: (value) {
                 if (value!.isEmpty) {
                   return "Digite uma senha";
-                } else if (passwordController.text.length < 8) {
-                  return "A senha tem que conter pelo menos 8 caracteres";
                 }
                 return null;
               },
@@ -159,18 +159,32 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
             const SizedBox(
               height: 20,
             ),
-            const Wrap(
+            Wrap(
               direction: Axis.horizontal,
               alignment: WrapAlignment.center,
               children: [
                 SizedBox(
-                  width: 100,
+                  width: 60,
                   child: Padding(
                     padding: EdgeInsets.only(top: 20.0, right: 20),
-                    child: SwitchLocation(),
+                    child: Switch(
+                      overlayColor: overlayColor,
+                      trackColor: trackColor,
+                      thumbColor:
+                          const MaterialStatePropertyAll<Color>(Colors.white),
+                      value: isSwitched,
+                      onChanged: (bool value) {
+                        setState(() {
+                          isSwitched = value;
+                        });
+                        if (isSwitched == true) {
+                          location.requestPermission();
+                        } else {}
+                      },
+                    ),
                   ),
                 ),
-                Text(
+                const Text(
                   "Permitir o acesso da minha \n localização durante o uso do \n aplicativo.",
                   style: TextStyle(
                     fontWeight: FontWeight.w400,
@@ -182,10 +196,10 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
             const SizedBox(height: 50),
             InkWell(
               onTap: () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
                 if (_formKey.currentState!.validate()) {
-                  print("Sucesso");
-                  emailController.clear();
-                  passwordController.clear();
+                  _onClickCadastre(context);
+                  currentFocus.unfocus();
                 }
               },
               child: Container(
@@ -210,4 +224,82 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
       ),
     );
   }
+
+  _onClickCadastre(BuildContext context) async {
+    final name = nameController.text;
+    final email = emailController.text;
+    final password = passwordController.text;
+    print(
+        "login: $name, Email: $email,  Senha: $password, isSwitched: $isSwitched");
+
+    var response = await RegisterUserApi.register(
+      name,
+      email,
+      password,
+      isSwitched,
+    );
+    if (response == true) {
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WelcomePage(),
+        ),
+      );
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(snackBarSucceess);
+    } else {
+      passwordController.clear();
+      print("${response}");
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(snackBarError);
+    }
+  }
+
+  final snackBarError = const SnackBar(
+    content: Text(
+      'Não foi possível realizar o  cadastro!',
+      textAlign: TextAlign.center,
+    ),
+    backgroundColor: Colors.redAccent,
+  );
+
+  final snackBarSucceess = const SnackBar(
+    content: Text(
+      'Cadastrado com sucesso!',
+      textAlign: TextAlign.center,
+    ),
+    backgroundColor: Colors.greenAccent,
+  );
+  final MaterialStateProperty<Color?> overlayColor =
+      MaterialStateProperty.resolveWith<Color?>(
+    (Set<MaterialState> states) {
+      // Material color when switch is selected.
+      if (states.contains(MaterialState.selected)) {
+        return Colors.grey.shade400;
+      }
+      // Material color when switch is disabled.
+      if (states.contains(MaterialState.disabled)) {
+        return Colors.grey.shade400;
+      }
+      // Otherwise return null to set default material color
+      // for remaining states such as when the switch is
+      // hovered, or focused.
+      return null;
+    },
+  );
+
+  final MaterialStateProperty<Color?> trackColor =
+      MaterialStateProperty.resolveWith<Color?>(
+    (Set<MaterialState> states) {
+      // Track color when the switch is selected.
+      if (states.contains(MaterialState.selected)) {
+        return Colors.black;
+      }
+      // Otherwise return null to set default track color
+      // for remaining states such as when the switch is
+      // hovered, focused, or disabled.
+      return null;
+    },
+  );
 }

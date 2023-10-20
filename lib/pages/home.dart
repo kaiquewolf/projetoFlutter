@@ -5,7 +5,6 @@ import 'package:projeto_flutter_mylink/components/maps.dart';
 import 'package:projeto_flutter_mylink/components/update.dart';
 import 'package:projeto_flutter_mylink/pages/welcome.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:geolocator/geolocator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,8 +14,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Position position;
-
   int _selectedIndex = 0;
   List screens = [const Maps(), const UpdateComponent(), const WelcomePage()];
 
