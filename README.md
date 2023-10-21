@@ -1,6 +1,6 @@
-# projeto_flutter_mylink
+# Projeto Flutter MyLink
 
-A new Flutter project.
+Um app com integração com o GoogleMaps, onde mostra a localização do usuário em tempo real!
 
 ## Getting Started
 
