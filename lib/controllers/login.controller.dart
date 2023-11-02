@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_flutter_mylink/errors/login.error.dart';
-import 'package:projeto_flutter_mylink/pages/home.dart';
 import 'package:projeto_flutter_mylink/repositories/login.repository.dart';
 import 'package:projeto_flutter_mylink/view-models/loginmodel.dart';
 
 class LoginController {
   late LoginRepository repository;
+  var model = LoginViewModel();
 
   LoginController() {
     repository = LoginRepository();
@@ -16,12 +16,7 @@ class LoginController {
 
     if (login == true) {
       // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-      );
+      Navigator.pushNamed(context, "/home");
     } else {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(snackbarloginError);

@@ -189,44 +189,32 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
               ],
             ),
             const SizedBox(height: 50),
-            model.buzy
-                ? const Center(
-                    child: CircularProgressIndicator(
-                      backgroundColor: Color(0xff142949),
-                    ),
-                  )
-                : InkWell(
-                    onTap: () {
-                      FocusScopeNode currentFocus = FocusScope.of(context);
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState?.save();
-                        currentFocus.unfocus();
-                        setState(() {
-                          model.buzy = true;
-                        });
-                        _controller.register(model, context);
-                      }
-                      setState(() {
-                        model.buzy = false;
-                      });
-                    },
-                    child: Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: const Color(0xff142949),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          "Cadastrar",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
+            InkWell(
+              onTap: () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState?.save();
+                  currentFocus.unfocus();
+                  _controller.register(model, context);
+                }
+              },
+              child: Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: const Color(0xff142949),
+                ),
+                child: const Center(
+                  child: Text(
+                    "Cadastrar",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
                     ),
                   ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
