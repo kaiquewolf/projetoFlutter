@@ -1,10 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:projeto_flutter_mylink/components/maps.dart';
 import 'package:projeto_flutter_mylink/components/update.dart';
-import 'package:projeto_flutter_mylink/pages/welcome.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:projeto_flutter_mylink/controllers/sharedpreferences.controller.dart';
+import 'package:projeto_flutter_mylink/routes/welcome.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,8 +20,7 @@ class _HomePageState extends State<HomePage> {
       _selectedIndex = index;
     });
     if (_selectedIndex == 2) {
-      bool saiu = await sair();
-      if (saiu) {}
+      await exit();
     }
   }
 
@@ -57,10 +54,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-Future<bool> sair() async {
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  await sharedPreferences.clear();
-  return true;
 }

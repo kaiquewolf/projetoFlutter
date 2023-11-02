@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:projeto_flutter_mylink/controllers/login.controller.dart';
 import 'package:projeto_flutter_mylink/pages/cadastre.dart';
-import 'package:projeto_flutter_mylink/pages/home.dart';
-import 'package:projeto_flutter_mylink/http/api.dart';
+import 'package:projeto_flutter_mylink/view-models/loginmodel.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,21 +17,20 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: const Color(0xfff2f0f0),
       body: SingleChildScrollView(
-        reverse: true,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 100),
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: Column(
-              children: <Widget>[
-                Image.asset(
-                  'images/Logo.png',
-                ),
-                // ignore: prefer_const_constructors
-                MyFormCustom(),
-              ],
-            ),
+        scrollDirection: Axis.vertical,
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: <Widget>[
+              const SizedBox(
+                height: 20,
+              ),
+              Image.asset(
+                'images/Logo.png',
+              ),
+              // ignore: prefer_const_constructors
+              MyFormCustom(),
+            ],
           ),
         ),
       ),
@@ -50,8 +49,9 @@ class MyFormCustom extends StatefulWidget {
 
 class MyFormCustomState extends State<MyFormCustom> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _controller = LoginController();
+
+  var model = LoginViewModel();
   bool passToggle = true;
 
   @override
@@ -85,7 +85,6 @@ class MyFormCustomState extends State<MyFormCustom> {
             ),
             TextFormField(
               keyboardType: TextInputType.emailAddress,
-              controller: _emailController,
               decoration: const InputDecoration(
                 labelText: 'name@example.com',
                 border: OutlineInputBorder(),
@@ -97,6 +96,9 @@ class MyFormCustomState extends State<MyFormCustom> {
                   return "Digite um Email válido";
                 }
                 return null;
+              },
+              onSaved: (value) {
+                model.email = value;
               },
             ),
             const SizedBox(height: 20),
@@ -116,7 +118,6 @@ class MyFormCustomState extends State<MyFormCustom> {
             ),
             TextFormField(
               keyboardType: TextInputType.visiblePassword,
-              controller: _passwordController,
               obscureText: passToggle,
               decoration: InputDecoration(
                 labelText: "************",
@@ -136,36 +137,48 @@ class MyFormCustomState extends State<MyFormCustom> {
                 }
                 return null;
               },
+              onSaved: (value) {
+                model.password = value;
+              },
             ),
             const SizedBox(height: 20),
-            InkWell(
-              onTap: () {
-                FocusScopeNode currentFocus = FocusScope.of(context);
-                if (_formKey.currentState!.validate()) {
-                  if (!currentFocus.hasPrimaryFocus) {
-                    // CircularProgressIndicator();
-                    _onClickLogin(context);
-                    currentFocus.unfocus();
-                  }
-                }
-              },
-              child: Container(
-                height: 50,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: const Color(0xff142949),
-                ),
-                child: const Center(
-                  child: Text(
-                    "Acessar",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
+            model.buzy
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Color(0xff142949),
+                    ),
+                  )
+                : InkWell(
+                    onTap: () {
+                      FocusScopeNode currentFocus = FocusScope.of(context);
+                      if (_formKey.currentState!.validate()) {
+                        if (!currentFocus.hasPrimaryFocus) {
+                          currentFocus.unfocus();
+                        }
+                        _formKey.currentState?.save();
+                        setState(() {
+                          model.buzy = true;
+                        });
+                        _controller.login(model, context);
+                      }
+                    },
+                    child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: const Color(0xff142949),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "Acessar",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
             const SizedBox(height: 50),
             SizedBox(
               height: 50,
@@ -189,7 +202,7 @@ class MyFormCustomState extends State<MyFormCustom> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => CadastrePage()),
+                    MaterialPageRoute(builder: (_) => const CadastrePage()),
                   );
                 },
               ),
@@ -199,33 +212,4 @@ class MyFormCustomState extends State<MyFormCustom> {
       ),
     );
   }
-
-  _onClickLogin(BuildContext context) async {
-    final login = _emailController.text;
-    final password = _passwordController.text;
-    print("login: $login, Senha: $password");
-
-    var response = await LoginApi.login(login, password);
-    if (response == true) {
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(),
-        ),
-      );
-    } else {
-      _passwordController.clear();
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-  }
-
-  final snackBar = const SnackBar(
-    content: Text(
-      'email ou senha incorretos.',
-      textAlign: TextAlign.center,
-    ),
-    backgroundColor: Colors.redAccent,
-  );
 }

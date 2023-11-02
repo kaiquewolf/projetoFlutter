@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:projeto_flutter_mylink/http/api.dart';
-import 'package:projeto_flutter_mylink/pages/welcome.dart';
+import 'package:projeto_flutter_mylink/controllers/cadastre.controller.dart';
+import 'package:projeto_flutter_mylink/theme/switchtheme.dart';
+import 'package:projeto_flutter_mylink/view-models/cadastremodel.dart';
 
 class CadastrePage extends StatefulWidget {
   const CadastrePage({super.key});
@@ -20,7 +21,7 @@ class _CadastrePageState extends State<CadastrePage> {
         reverse: true,
         child: Padding(
           padding: const EdgeInsets.only(top: 100.0),
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.of(context).size.width,
             child: const Column(
               children: <Widget>[
@@ -43,9 +44,9 @@ class CadastrePageForm extends StatefulWidget {
 
 class _CadastrePageFormState extends State<CadastrePageForm> {
   final _formKey = GlobalKey<FormState>();
-  final nameController = TextEditingController();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final _controller = CadastreController();
+
+  var model = CadastreViewModel();
   bool isSwitched = false;
 
   @override
@@ -75,7 +76,6 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
             ),
             TextFormField(
               keyboardType: TextInputType.name,
-              controller: nameController,
               decoration: const InputDecoration(
                 labelText: 'João da Silva',
                 border: OutlineInputBorder(),
@@ -85,6 +85,9 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
                   return 'Por favor insira seu nome';
                 }
                 return null;
+              },
+              onSaved: (value) {
+                model.name = value;
               },
             ),
             const SizedBox(
@@ -102,7 +105,6 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
             ),
             TextFormField(
               keyboardType: TextInputType.emailAddress,
-              controller: emailController,
               decoration: const InputDecoration(
                 labelText: 'name@example.com',
                 border: OutlineInputBorder(),
@@ -114,6 +116,9 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
                   return "Digite um Email válido";
                 }
                 return null;
+              },
+              onSaved: (value) {
+                model.email = value;
               },
             ),
             const SizedBox(
@@ -131,7 +136,6 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
             ),
             TextFormField(
               keyboardType: TextInputType.visiblePassword,
-              controller: passwordController,
               decoration: const InputDecoration(
                 labelText: '**********',
                 border: OutlineInputBorder(),
@@ -141,6 +145,9 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
                   return "Digite uma senha";
                 }
                 return null;
+              },
+              onSaved: (value) {
+                model.password = value;
               },
             ),
             const SizedBox(
@@ -153,7 +160,7 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
                 SizedBox(
                   width: 60,
                   child: Padding(
-                    padding: EdgeInsets.only(top: 20.0, right: 20),
+                    padding: const EdgeInsets.only(top: 20.0, right: 20),
                     child: Switch(
                       overlayColor: overlayColor,
                       trackColor: trackColor,
@@ -167,6 +174,7 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
                         if (isSwitched == true) {
                           Geolocator.requestPermission();
                         } else {}
+                        model.authorizelocation = isSwitched;
                       },
                     ),
                   ),
@@ -181,112 +189,44 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
               ],
             ),
             const SizedBox(height: 50),
-            InkWell(
-              onTap: () {
-                FocusScopeNode currentFocus = FocusScope.of(context);
-                if (_formKey.currentState!.validate()) {
-                  _onClickCadastre(context);
-                  currentFocus.unfocus();
-                }
-              },
-              child: Container(
-                height: 50,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: const Color(0xff142949),
-                ),
-                child: const Center(
-                  child: Text(
-                    "Cadastrar",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
+            model.buzy
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Color(0xff142949),
+                    ),
+                  )
+                : InkWell(
+                    onTap: () {
+                      FocusScopeNode currentFocus = FocusScope.of(context);
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState?.save();
+                        currentFocus.unfocus();
+                        setState(() {
+                          model.buzy = true;
+                        });
+                        _controller.register(model, context);
+                      }
+                    },
+                    child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: const Color(0xff142949),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "Cadastrar",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
-
-  _onClickCadastre(BuildContext context) async {
-    final name = nameController.text;
-    final email = emailController.text;
-    final password = passwordController.text;
-    print(
-        "login: $name, Email: $email,  Senha: $password, isSwitched: $isSwitched");
-
-    var response = await RegisterUserApi.register(
-      name,
-      email,
-      password,
-      isSwitched,
-    );
-    if (response == true) {
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => WelcomePage(),
-        ),
-      );
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(snackBarSucceess);
-    } else {
-      passwordController.clear();
-      print("${response}");
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(snackBarError);
-    }
-  }
-
-  final snackBarError = const SnackBar(
-    content: Text(
-      'Não foi possível realizar o  cadastro!',
-      textAlign: TextAlign.center,
-    ),
-    backgroundColor: Colors.redAccent,
-  );
-
-  final snackBarSucceess = const SnackBar(
-    content: Text(
-      'Cadastrado com sucesso!',
-      textAlign: TextAlign.center,
-    ),
-    backgroundColor: Colors.greenAccent,
-  );
-  final MaterialStateProperty<Color?> overlayColor =
-      MaterialStateProperty.resolveWith<Color?>(
-    (Set<MaterialState> states) {
-      // Material color when switch is selected.
-      if (states.contains(MaterialState.selected)) {
-        return Colors.grey.shade400;
-      }
-      // Material color when switch is disabled.
-      if (states.contains(MaterialState.disabled)) {
-        return Colors.grey.shade400;
-      }
-      // Otherwise return null to set default material color
-      // for remaining states such as when the switch is
-      // hovered, or focused.
-      return null;
-    },
-  );
-
-  final MaterialStateProperty<Color?> trackColor =
-      MaterialStateProperty.resolveWith<Color?>(
-    (Set<MaterialState> states) {
-      // Track color when the switch is selected.
-      if (states.contains(MaterialState.selected)) {
-        return Colors.black;
-      }
-      // Otherwise return null to set default track color
-      // for remaining states such as when the switch is
-      // hovered, focused, or disabled.
-      return null;
-    },
-  );
 }
