@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:projeto_flutter_mylink/components/maps.dart';
 import 'package:projeto_flutter_mylink/pages/cadastre.dart';
+import 'package:projeto_flutter_mylink/pages/home.dart';
 import 'package:projeto_flutter_mylink/pages/login.dart';
 import 'package:projeto_flutter_mylink/routes/welcome.dart';
 
@@ -13,7 +13,7 @@ void main() {
         '/': (_) => const WelcomePage(),
         '/login': (_) => const LoginPage(),
         '/cadastre': (_) => const CadastrePage(),
-        '/maps': (_) => const Maps(),
+        '/home': (_) => const HomePage(),
       },
       debugShowCheckedModeBanner: false,
     ),

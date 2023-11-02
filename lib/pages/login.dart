@@ -22,8 +22,8 @@ class _LoginPageState extends State<LoginPage> {
           width: MediaQuery.of(context).size.width,
           child: Column(
             children: <Widget>[
-              const SizedBox(
-                height: 20,
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.15,
               ),
               Image.asset(
                 'images/Logo.png',

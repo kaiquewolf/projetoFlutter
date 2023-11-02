@@ -14,7 +14,7 @@ class _WelcomePageState extends State<WelcomePage> {
     super.initState();
     verifyToken().then((value) {
       if (value) {
-        Navigator.pushNamed(context, '/maps');
+        Navigator.pushNamed(context, '/home');
       } else {
         Navigator.pushNamed(context, '/login');
       }
