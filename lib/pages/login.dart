@@ -161,6 +161,9 @@ class MyFormCustomState extends State<MyFormCustom> {
                         });
                         _controller.login(model, context);
                       }
+                      setState(() {
+                        model.buzy = false;
+                      });
                     },
                     child: Container(
                       height: 50,

@@ -206,6 +206,9 @@ class _CadastrePageFormState extends State<CadastrePageForm> {
                         });
                         _controller.register(model, context);
                       }
+                      setState(() {
+                        model.buzy = false;
+                      });
                     },
                     child: Container(
                       height: 50,

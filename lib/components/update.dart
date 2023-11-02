@@ -198,6 +198,9 @@ class _UpdatePageFormState extends State<UpdatePageForm> {
                               _controller.update(model, context);
                             }
                           }
+                          setState(() {
+                            model.buzy = false;
+                          });
                         },
                         child: Container(
                           height: 50,
